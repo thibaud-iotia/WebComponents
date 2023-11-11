@@ -1,3 +1,8 @@
+import "./libs/webaudiocontrols.js";
+
+const getBaseURL = () => {
+    return new URL('.', import.meta.url);
+};
 export class MyEqualizer extends HTMLElement {
     constructor(){
         super();
@@ -7,6 +12,8 @@ export class MyEqualizer extends HTMLElement {
             <label>60Hz</label>
             <input type="range" value="0" step="1" min="-30" max="30" ></input>
             <output id="gain0">0 dB</output>
+    <!-- <webaudio-slider midilearn="1" midicc="1.23" src="./images/slider.png" value="0" min="0" max="100" step="1" basewidth="24" baseheight="128" knobwidth="24" knobheight="24" ditchlength="100" tooltip="Slider-L"></webaudio-slider> -->
+            
         </div>
         <div class="controls">
             <label>170Hz</label>
@@ -35,11 +42,23 @@ export class MyEqualizer extends HTMLElement {
         </div>
         `;
         this.filters = [];
+        this.baseURL = getBaseURL();
     }
     connectedCallback() {
         // On affiche le code qu'on a recupéré en attribut
         this.defineListeners();
         console.log("connected callback equalizer")
+        this.changeRelativeURLsToAbsolute();
+    }
+    changeRelativeURLsToAbsolute() {
+        let elements = this.shadowRoot.querySelectorAll('img, webaudio-knob, webaudio-switch, webaudio-slider');
+        
+        elements.forEach((e) => {
+          let elementPath = e.getAttribute('src');
+          // if the image path isn't already absolute, make it absolute
+          if (elementPath.indexOf('://') === -1)
+            e.src = getBaseURL() + '/' + elementPath;
+        });
     }
     setContext(ctx, sourceNode) {
         this.ctx = ctx;
