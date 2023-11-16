@@ -76,12 +76,37 @@ export class MyAudioPlayer extends HTMLElement {
         margin-left: auto; /* Aligner à droite */
 
       }
-      ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        width: 200px;
-        background-color: #f1f1f1;
+      // ul {
+      //   list-style-type: none;
+      //   margin: 0;
+      //   padding: 0;
+      //   width: 200px;
+      //   background-color: #f1f1f1;
+      // }
+      [draggable="true"] {
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+      
+      ul.moveable {
+        list-style: none;
+        margin: 0px;
+      }
+      
+      ul.moveable li {
+        list-style-image: none;
+        margin: 10px;
+        border: 1px solid #ccc;
+        padding: 4px;
+        border-radius: 4px;
+        color: #666;
+        cursor: move;
+      }
+      
+      ul.moveable li:hover {
+        background-color: #eee;
       }
       
       .equalizer {
@@ -318,11 +343,62 @@ export class MyAudioPlayer extends HTMLElement {
   loadSoundName(names) {
     //display sounds array name in playlist class
     const playList = this.shadowRoot.querySelector('.playList');
-    playList.innerHTML = `<p>My playlist:</p><ul>
+    playList.innerHTML = `<p>My playlist:</p><ul  id="items-list" class="moveable">
     ${names.map((sound) => `<li>${sound}</li>`).join('')}
     </ul>`;
-  }
+    let items = this.shadowRoot.querySelectorAll('#items-list > li');
 
+    items.forEach((item, index) => {
+      item.draggable = true;
+      item.addEventListener('dragstart', (e) => this.dragStart(e, index));
+      item.addEventListener('drop', this.dropped);
+      item.addEventListener('dragenter', this.cancelDefault);
+      item.addEventListener('dragover', this.cancelDefault);
+    });
+  }
+  dragStart(e, index) {
+    e.dataTransfer.setData('text/plain', index);
+  }
+  
+  dropped = (e) => {
+    this.cancelDefault(e);
+  
+    // get new and old index
+    let oldIndex = e.dataTransfer.getData('text/plain');
+    const target = e.target;
+    let newIndex = this.getIndex(target);
+  
+    // Ensure the target has a parentNode before proceeding
+    if (target.parentNode) {
+      console.log(target.parentNode);
+      // remove dropped items at old place
+      let dropped = target.parentNode.removeChild(target);
+      console.log(target);
+  
+      // insert the dropped items at new place
+      if (newIndex < oldIndex) {
+        target.parentNode.insertBefore(dropped, target);
+      } else {
+        target.parentNode.insertBefore(dropped, target.nextSibling);
+      }
+    }
+  };
+  
+  getIndex = (element) => {
+    let index = 0;
+    while ((element = element.previousElementSibling) !== null) {
+      index++;
+    }
+    return index;
+  }
+  
+  cancelDefault = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+  
+  
   // declare l'attribut "correctcode" comme étant "observé"
   static get observedAttributes() {
     return ["src"];
