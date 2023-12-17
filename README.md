@@ -34,7 +34,7 @@ Pour apporter un effet visuel, le projet se base sur [Butterchurn](https://githu
   * MyPlaylist
 
 ## Explications 
-![présentation du projet](assets\img\doc.png)
+![présentation du projet](assets/img/doc.png)
 
 
 
