@@ -402,6 +402,7 @@ export class MyAudioPlayer extends HTMLElement {
     this.myPlaylist.loadSoundName(this.getFiles());
     // this.myPlaylist.updatePlaylist();
     this.audioElement.play();
+    this.myButterChurn.changeStarted(true);
   }
   defineListeners() {
     const moveForward = this.shadowRoot.querySelector('#moveForward');
@@ -426,6 +427,7 @@ export class MyAudioPlayer extends HTMLElement {
       this.myPlaylist.loadSoundName(this.getFiles());
       this.audioElement.play();
       this.play.innerHTML = stopButtonSVG;
+      this.myButterChurn.changeStarted(true);
     }
     nextSound.onclick = () => {
       this.doNextSound();
@@ -454,6 +456,7 @@ export class MyAudioPlayer extends HTMLElement {
       //il faut que le son joué ne soit pas rejouable avec les boutons next et previous 
       //donc on le met en premier dans le tableau
       this.getFiles().unshift(this.getFiles().splice(index, 1)[0]);
+      this.myButterChurn.changeStarted(true);
     });
     //A la fin de la musique, on passe à la suivante
     this.audioElement.addEventListener('ended', () => {
